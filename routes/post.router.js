@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const validateObjectId = require("../middlewares/validateObjectId");
 const Posts = require("../models/post.model");
 
 // * Get all posts
@@ -45,7 +46,7 @@ router.post("/", async (req, res) => {
 });
 
 // * Get post by id
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateObjectId(), async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Posts.findById(postId);
@@ -62,14 +63,14 @@ router.get("/:id", async (req, res) => {
 });
 
 // * Update post
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateObjectId(), async (req, res) => {
   try {
     const postId = req.params.id;
     const updatingPostBody = req.body;
     const post = await Posts.findById(postId);
 
     if (!post) return res.status(404).json({ message: "Post not found" });
-    if (Object.keys(updatingPostBody).length === 0)
+    if (!Object.keys(updatingPostBody).length)
       return res.status(400).json({ message: "Send updating post data" });
 
     if (typeof updatingPostBody.title === "string")
@@ -92,7 +93,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // * Delete post
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateObjectId(), async (req, res) => {
   try {
     const postId = req.params.id;
     const post = await Posts.findById(postId);
